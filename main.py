@@ -96,4 +96,14 @@ class Book(Item):
         return id
 
 
-Book("three pigs", "child story", ["me", "antpu"]).save()
+# Book("three pigs", "child story", ["me", "antpu"]).save()
+
+def show_menu():
+    with open("main_menu.txt", "r") as menu:
+        print("".join(menu.readlines()))
+show_menu()
+lib = Item.read_items()
+input = input("pls enter your option:")
+if input == "1":
+    for item in lib:
+        print(item,lib[item])
