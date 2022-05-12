@@ -73,6 +73,18 @@ class Item:
                 writer.writerow({"id": str(id), "name": self.name, "type": self.type, "description": self.description })
         return id
 
+    def save_db(db:dict[str,dict]):
+        '''
+        take modified db returned by read_items() and save to file
+        '''
+        headers = ["id", "name", "type", "description"]
+        with open(ITEMS_FILE_URL, "w", newline="") as items_file:
+            writer = csv.DictWriter(items_file, headers)
+            writer.writeheader()
+            for key_id in db:
+                writer.writerow({"id": key_id, "name": db[key_id]["name"], "type": db[key_id]["type"], "description": db[key_id]["description"] })
+        print("<saved>")
+    
     def update_by_id(id:str) -> str:
         '''
         update by id
@@ -87,13 +99,7 @@ class Item:
                 opt = input("pls enter the option (name/description/save/q): ")
                 if opt == "save":
                     # write back changed db to file
-                    headers = ["id", "name", "type", "description"]
-                    with open(ITEMS_FILE_URL, "w", newline="") as items_file:
-                        writer = csv.DictWriter(items_file, headers)
-                        writer.writeheader()
-                        for key_id in db:
-                            writer.writerow({"id": key_id, "name": db[key_id]["name"], "type": db[key_id]["type"], "description": db[key_id]["description"] })
-                    print("saved")
+                    Item.save_db(db)
                     break
                 elif opt == "name" or opt == "description":
                     value = input("pls enter new value: ")
@@ -101,11 +107,28 @@ class Item:
                     db[id][opt] = value
                     print("change staged:" + opt + ":" + value)
                 elif opt == "q":
-                    print("canceled")
+                    print("<canceled>")
                     break
                 else:
                     print("invalid option")
 
+            return id
+        else:
+            return "invalid id"
+    
+    def delete_by_id(id:str):
+        '''
+        delete by id
+        return same id for successful operation
+        return error message for invalid id 
+        '''
+        db = Item.read_items()
+        if id in db:
+            print("curr:: " + "id: " + id + ", name: " + db[id]["name"] )
+            opt = input("delete? y/n: ")
+            if opt.lower() == "y":
+                del db[id]
+                Item.save_db(db)
             return id
         else:
             return "invalid id"
@@ -183,6 +206,14 @@ elif opt == "6":
     while True:
         id_input = input("pls enter item id: ")
         res = Item.update_by_id(id_input)
+        if res == id_input:
+            break
+        else:
+            print(res)
+elif opt == "7":
+    while True:
+        id_input = input("pls enter item id: ")
+        res = Item.delete_by_id(id_input)
         if res == id_input:
             break
         else:
