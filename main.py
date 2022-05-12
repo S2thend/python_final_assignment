@@ -73,7 +73,7 @@ class Item:
                 writer.writerow({"id": str(id), "name": self.name, "type": self.type, "description": self.description })
         return id
 
-    def save_db(db:dict[str,dict]):
+    def save_db_item(db:dict[str,dict]):
         '''
         take modified db returned by read_items() and save to file
         '''
@@ -99,7 +99,7 @@ class Item:
                 opt = input("pls enter the option (name/description/save/q): ")
                 if opt == "save":
                     # write back changed db to file
-                    Item.save_db(db)
+                    Item.save_db_item(db)
                     break
                 elif opt == "name" or opt == "description":
                     value = input("pls enter new value: ")
@@ -127,8 +127,12 @@ class Item:
             print("curr:: " + "id: " + id + ", name: " + db[id]["name"] )
             opt = input("delete? y/n: ")
             if opt.lower() == "y":
+                if db[id]["type"] == BOOK_TYPE:
+                    book_author_db = Book.read_book_author()
+                    del book_author_db[id]
+                    Book.save_db_book_author(book_author_db)
                 del db[id]
-                Item.save_db(db)
+                Item.save_db_item(db)
             return id
         else:
             return "invalid id"
@@ -151,18 +155,29 @@ class Book(Item):
         '''
         return Item.read_items(type=BOOK_TYPE)
 
-    def read_book_author() -> set[tuple]:
+    def read_book_author() -> dict[str,list[str]]:
         '''
-        get primary-key set
-        primary-key of book_author is combined key (book_id,author):tuple
+        get book_author file to k:id, v:author list
         '''
-        pk_set = set()
+        db = {}
         with open(BOOK_AUTHOR_FILE_URL, "r", newline="") as book_author_file:
             reader = csv.DictReader(book_author_file)
             for item in reader:
-                pk = (item["id"], item["author"])
-                pk_set.add(pk)
-        return pk_set
+                if item["id"] in db:
+                    db[item["id"]].append(item["author"])
+                else:
+                    db[item["id"]] = [item["author"]]
+        return db
+
+    def save_db_book_author(db: dict):
+        headers = ["id", "author"]
+        with open(BOOK_AUTHOR_FILE_URL, "w", newline="") as book_author_file:
+            writer = csv.DictWriter(book_author_file, headers)
+            writer.writeheader()
+            for id in db: 
+                for author in db[id]:
+                    writer.writerow({"id": id, "author": author })
+
 
     def save(self) -> str:
         '''
@@ -173,9 +188,9 @@ class Book(Item):
         # save author info to book_author file
         headers = ["id", "author"]
         try:
-            pk_set = Book.read_book_author()
+            db = Book.read_book_author()
             # if file no existance or empty go to except block
-            if len(pk_set) == 0:
+            if len(db) == 0:
                 raise IOError
             # save using the same id used for items file
             with open(BOOK_AUTHOR_FILE_URL, "a", newline="") as book_author_file:
@@ -189,6 +204,9 @@ class Book(Item):
                 for author in self.authors:
                     writer.writerow({"id": id, "author": author })
         return id
+    
+    def delete_by_id(id: str):
+        return super().delete_by_id()
 
 
 # Book("three pigs", "child story", ["me", "antpu"]).save()
