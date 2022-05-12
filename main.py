@@ -73,6 +73,44 @@ class Item:
                 writer.writerow({"id": str(id), "name": self.name, "type": self.type, "description": self.description })
         return id
 
+    def update_by_id(id:str) -> str:
+        '''
+        update by id
+        return same id for successful operation
+        return error message for invalid id 
+        '''
+        # read db from file
+        db = Item.read_items()
+        if id in db:
+            print("curr:: " + "id: " + id + ", name: " + db[id]["name"] )
+            while True:
+                opt = input("pls enter the option (name/description/save/q): ")
+                if opt == "save":
+                    # write back changed db to file
+                    headers = ["id", "name", "type", "description"]
+                    with open(ITEMS_FILE_URL, "w", newline="") as items_file:
+                        writer = csv.DictWriter(items_file, headers)
+                        writer.writeheader()
+                        for key_id in db:
+                            writer.writerow({"id": key_id, "name": db[key_id]["name"], "type": db[key_id]["type"], "description": db[key_id]["description"] })
+                    print("saved")
+                    break
+                elif opt == "name" or opt == "description":
+                    value = input("pls enter new value: ")
+                    # save change to db
+                    db[id][opt] = value
+                    print("change staged:" + opt + ":" + value)
+                elif opt == "q":
+                    print("canceled")
+                    break
+                else:
+                    print("invalid option")
+
+            return id
+        else:
+            return "invalid id"
+        
+
 
 # book class inherit item class
 class Book(Item):
@@ -130,14 +168,22 @@ class Book(Item):
         return id
 
 
-Book("three pigs", "child story", ["me", "antpu"]).save()
+# Book("three pigs", "child story", ["me", "antpu"]).save()
 
-# def show_menu():
-#     with open("main_menu.txt", "r") as menu:
-#         print("".join(menu.readlines()))
-# show_menu()
-# lib = Book.read_items()
-# input = input("pls enter your option:")
-# if input == "1":
-#     for item in lib:
-#         print(item,lib[item])
+def show_menu():
+    with open("main_menu.txt", "r") as menu:
+        print("".join(menu.readlines()))
+show_menu()
+lib = Book.read_items()
+opt = input("pls enter your option: ")
+if opt == "1":
+    for item in lib:
+        print(item,lib[item])
+elif opt == "6":
+    while True:
+        id_input = input("pls enter item id: ")
+        res = Item.update_by_id(id_input)
+        if res == id_input:
+            break
+        else:
+            print(res)
