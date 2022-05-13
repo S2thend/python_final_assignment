@@ -77,7 +77,7 @@ elif opt == "2":
 elif opt == "6":
     while True:
         id_input = input("pls enter item id: ")
-        res = Item.update_by_id(id_input)
+        res = Item.update_by_id(id_input,item_db_all)
         if res == id_input:
             break
         else:
@@ -85,8 +85,14 @@ elif opt == "6":
 elif opt == "7":
     while True:
         id_input = input("pls enter item id: ")
-        res = Item.delete_by_id(id_input)
-        if res == id_input:
+        if id_input in item_db_all:
+            print("curr:: " + "id: " + id_input + ", name: " + item_db_all[id_input]["name"] )
+            opt = input("delete? y/n: ")
+            if opt.lower() == "y":
+                if item_db_all[id_input]["type"] == BOOK_TYPE:
+                    # cascade deleting associated data
+                    Book.delete_by_id(id_input)
+            Item.delete_by_id(id_input,item_db_all)
             break
         else:
-            print(res)
+            print("invalid id")

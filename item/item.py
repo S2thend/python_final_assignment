@@ -4,6 +4,7 @@
 # library.txt,items.txt, members.txt, and borrowing.txt 
 
 import csv
+import copy
 from util.constants import ITEMS_FILE_URL,BOOK_AUTHOR_FILE_URL,BOOK_TYPE
 
 
@@ -87,26 +88,26 @@ class Item:
                 writer.writerow({"id": key_id, "name": db[key_id]["name"], "type": db[key_id]["type"], "description": db[key_id]["description"] })
         print("<saved>")
     
-    def update_by_id(id:str) -> str:
+    def update_by_id(id:str, db:dict) -> str:
         '''
         update by id
         return same id for successful operation
         return error message for invalid id 
         '''
-        # read db from file
-        db = Item.read_items()
+        # take db copy to allow cancelling changes
+        db_copy = copy.deepcopy(db)
         if id in db:
-            print("curr:: " + "id: " + id + ", name: " + db[id]["name"] )
+            print("curr:: " + "id: " + id + ", name: " + db_copy[id]["name"] )
             while True:
                 opt = input("pls enter the option (name/description/save/q): ")
                 if opt == "save":
                     # write back changed db to file
-                    Item.save_db_item(db)
+                    Item.save_db_item(db_copy)
                     break
                 elif opt == "name" or opt == "description":
                     value = input("pls enter new value: ")
                     # save change to db
-                    db[id][opt] = value
+                    db_copy[id][opt] = value
                     print("change staged:" + opt + ":" + value)
                 elif opt == "q":
                     print("<canceled>")
@@ -118,26 +119,17 @@ class Item:
         else:
             return "invalid id"
     
-    def delete_by_id(id:str):
+    def delete_by_id(id:str, db_input:dict):
         '''
         delete by id
         return same id for successful operation
         return error message for invalid id 
         '''
-        db = Item.read_items()
-        if id in db:
-            print("curr:: " + "id: " + id + ", name: " + db[id]["name"] )
-            opt = input("delete? y/n: ")
-            if opt.lower() == "y":
-                if db[id]["type"] == BOOK_TYPE:
-                    book_author_db = Book.read_book_author()
-                    del book_author_db[id]
-                    Book.save_db_book_author(book_author_db)
-                del db[id]
-                Item.save_db_item(db)
-            return id
-        else:
-            return "invalid id"
+        # take db copy to allow cancelling changes
+        db = copy.deepcopy(db_input)
+        del db[id]
+        Item.save_db_item(db)
+
         
 
 
@@ -150,12 +142,6 @@ class Book(Item):
 
     def __str__(self) -> str:
         return Item.__str__(self) + ", authors: " + ", ".join(self.authors)
-
-    def read_items() -> dict[str, dict]:
-        '''
-        get all items of type Book
-        '''
-        return Item.read_items(type=BOOK_TYPE)
 
     def read_book_author() -> dict[str,list[str]]:
         '''
@@ -179,7 +165,6 @@ class Book(Item):
             for id in db: 
                 for author in db[id]:
                     writer.writerow({"id": id, "author": author })
-
 
     def save(self) -> str:
         '''
@@ -208,4 +193,6 @@ class Book(Item):
         return id
     
     def delete_by_id(id: str):
-        return super().delete_by_id()
+        book_author_db = Book.read_book_author()
+        del book_author_db[id]
+        Book.save_db_book_author(book_author_db)
