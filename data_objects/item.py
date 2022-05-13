@@ -5,7 +5,7 @@
 
 import csv
 import copy
-from util.constants import ITEMS_FILE_URL,BOOK_AUTHOR_FILE_URL,BOOK_TYPE
+from util.constants import ARTICLE_TYPE, DIGITAL_TYPE, ITEMS_FILE_URL,BOOK_AUTHOR_FILE_URL,BOOK_TYPE
 
 
 # item class
@@ -130,9 +130,6 @@ class Item:
         del db[id]
         Item.save_db_item(db)
 
-        
-
-
 # book class inherit item class
 class Book(Item):
 
@@ -196,3 +193,39 @@ class Book(Item):
         book_author_db = Book.read_book_author()
         del book_author_db[id]
         Book.save_db_book_author(book_author_db)
+
+
+
+# article class inherit item class
+class Article(Item):
+
+    def __init__(self, name:str, description:str) -> None:
+        Item.__init__(self, name, ARTICLE_TYPE, description)
+
+    def __str__(self) -> str:
+        return Item.__str__(self)
+
+    def save(self) -> str:
+        '''
+        save item of type "article"
+        '''
+        # save general info to items file
+        id = Item.save(self)
+        return id
+
+# DigitalMedia class inherit item class
+class DigitalMedia(Item):
+
+    def __init__(self, name:str, description:str) -> None:
+        Item.__init__(self, name, DIGITAL_TYPE, description)
+
+    def __str__(self) -> str:
+        return Item.__str__(self)
+
+    def save(self) -> str:
+        '''
+        save item of type "Digital"
+        '''
+        # save general info to items file
+        id = Item.save(self)
+        return id
