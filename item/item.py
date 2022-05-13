@@ -4,10 +4,8 @@
 # library.txt,items.txt, members.txt, and borrowing.txt 
 
 import csv
+from util.constants import ITEMS_FILE_URL,BOOK_AUTHOR_FILE_URL,BOOK_TYPE
 
-ITEMS_FILE_URL = "item/items.csv"
-BOOK_AUTHOR_FILE_URL = "item/book_author.csv"
-BOOK_TYPE = "Book"
 
 # item class
 class Item:
@@ -30,17 +28,21 @@ class Item:
         return dict using id as key, filtered by type.
         '''
         db = {}
-        with open(ITEMS_FILE_URL, "r", newline="") as items_file:
-            reader = csv.DictReader(items_file)
-            for item in reader:
-                # if type != None, then filter by type
-                if( (type == None) or (type == item["type"]) ):
-                    # add new element using id as key 
-                    db[item.get("id")] = {}
-                    # package all k,v pairs other than id into dict into new element 
-                    for key in item:
-                        if key != "id":
-                            db[item.get("id")][key] = item.get(key)
+        try:
+            with open(ITEMS_FILE_URL, "r", newline="") as items_file:
+                reader = csv.DictReader(items_file)
+                for item in reader:
+                    # if type != None, then filter by type
+                    if( (type == None) or (type == item["type"]) ):
+                        # add new element using id as key 
+                        db[item.get("id")] = {}
+                        # package all k,v pairs other than id into dict into new element 
+                        for key in item:
+                            if key != "id":
+                                db[item.get("id")][key] = item.get(key)
+        except:
+            # print("file items.csv doesn't exist") # DEBUG
+            pass
         return db
 
     def save(self) -> str:

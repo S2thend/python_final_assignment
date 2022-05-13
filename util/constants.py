@@ -1,0 +1,7 @@
+MAIN_MENU_URL = "config/main_menu.txt"
+CHOOSE_TYPE_URL = "config/type_choice.txt"
+BOOK_TYPE = "Book"
+ARTICLE_TYPE = "Article"
+DIGITAL_TYPE = "Digital"
+ITEMS_FILE_URL = "item/items.csv"
+BOOK_AUTHOR_FILE_URL = "item/book_author.csv"
