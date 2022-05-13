@@ -1,3 +1,4 @@
+from unicodedata import name
 from item.item import Book,Item
 from typing import Union
 from util.constants import MAIN_MENU_URL, CHOOSE_TYPE_URL, BOOK_TYPE, DIGITAL_TYPE, ARTICLE_TYPE
@@ -74,6 +75,14 @@ elif opt == "2":
         lambda : show_items(ARTICLE_TYPE),
         lambda : show_items(DIGITAL_TYPE)
     )
+elif opt == "5":
+    def add_book():
+        n = input("pls enter name: ")
+        d = input("pls enter desciption:")
+        a = input("pls enter authors, split by comma:")
+        authors = a.split(',')
+        Book(n,d,authors).save()
+    choose_type_op(add_book, add_book, add_book)
 elif opt == "6":
     while True:
         id_input = input("pls enter item id: ")
