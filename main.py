@@ -3,6 +3,7 @@ from locale import currency
 from data_objects.item import Article, Book, DigitalMedia,Item
 from typing import Union
 from data_objects.user import User
+from services.borrow_return import BorrowReturnService
 from util.constants import MAIN_MENU_URL, CHOOSE_TYPE_URL, BOOK_TYPE, DIGITAL_TYPE, ARTICLE_TYPE
 
 '''
@@ -22,6 +23,7 @@ from util.constants import MAIN_MENU_URL, CHOOSE_TYPE_URL, BOOK_TYPE, DIGITAL_TY
 # init data
 item_db_all = Item.read_items()
 users = User.read_users()
+borrow_return_service = BorrowReturnService()
 
 # print(users) #DEBUG
 
@@ -93,6 +95,17 @@ elif opt == "2":
         lambda : show_items(ARTICLE_TYPE),
         lambda : show_items(DIGITAL_TYPE)
     )
+# 3.borrow by id
+elif opt == "3":
+    id = input("pls enter item id: ")
+    print("id: " + id + " processing...")
+    borrow_return_service.log_borrow(username,id,item_db_all)
+# 4.return by id
+elif opt == "4":
+    id = input("pls enter item id: ")
+    print("id: " + id + " processing...")
+    borrow_return_service.log_return(username,id)
+# 5.add new item
 elif opt == "5":
     def add_book():
         n = input("pls enter name: ")
@@ -109,6 +122,7 @@ elif opt == "5":
         d = input("pls enter desciption:")
         DigitalMedia(n,d).save()
     choose_type_op(add_book, add_article, add_digital_media)
+#  6.upadate by id
 elif opt == "6":
     while True:
         id_input = input("pls enter item id: ")
@@ -117,6 +131,7 @@ elif opt == "6":
             break
         else:
             print(res)
+#  7.delete by id
 elif opt == "7":
     while True:
         id_input = input("pls enter item id: ")
