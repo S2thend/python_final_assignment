@@ -8,17 +8,17 @@ class User:
     def __str__(self) -> str:
         return "username: " + self.username
 
-    def read_users() -> list[dict]:
+    def read_users() -> dict[str,str]:
         '''
-        return list[dict] 
-        username:username
-        password:password
+        return dict[str,str] 
+        username:password
         '''
-        db = []
+        db = {}
         try:
             with open(USER_FILE_URL, "r", newline="") as file:
                 reader = csv.DictReader(file)
-                db = reader
+                for item in reader:
+                    db[item["username"]]=item["password"]
         except:
             # print("file users.csv doesn't exist") # DEBUG
             pass
@@ -29,7 +29,7 @@ class User:
             db = User.read_users()
             headers = ["username","password"]
             # file doesn't exist or empty file go to except block
-            if db == []:
+            if db == {}:
                 raise IOError
             # file is not empty then add new line to the end of the file
             with open(USER_FILE_URL, "a", newline="") as items_file:

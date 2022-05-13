@@ -1,6 +1,8 @@
-from unicodedata import name
+from getpass import getpass
+from locale import currency
 from data_objects.item import Article, Book, DigitalMedia,Item
 from typing import Union
+from data_objects.user import User
 from util.constants import MAIN_MENU_URL, CHOOSE_TYPE_URL, BOOK_TYPE, DIGITAL_TYPE, ARTICLE_TYPE
 
 '''
@@ -16,10 +18,12 @@ from util.constants import MAIN_MENU_URL, CHOOSE_TYPE_URL, BOOK_TYPE, DIGITAL_TY
  7.delete by id
  q.quit
 '''
-# Book("three pigs", "child story", ["me", "antpu"]).save()
 
 # init data
 item_db_all = Item.read_items()
+users = User.read_users()
+
+# print(users) #DEBUG
 
 def show_ui(url):
     '''ui control'''
@@ -59,6 +63,20 @@ def choose_type_op(book, art, digi):
         art()
     elif opt == "3":
         digi()
+
+def auth_user(uname,pwd) -> bool:
+    if users[uname] == pwd:
+        return True
+    return False
+
+
+username = input("pls enter username: ")
+password = input("pls enter password: ") #DEBUG
+# password = getpass("pls enter password: ")
+
+if auth_user(username,password):
+    print("login successful")
+
 
 
 
