@@ -78,71 +78,72 @@ password = input("pls enter password: ") #DEBUG
 
 if auth_user(username,password):
     print("login successful")
-
-
-
-
-# ui and control logic
-show_ui(MAIN_MENU_URL)
-opt = input("pls enter your option: ")
-# list all items
-if opt == "1":
-    show_items()
-# list items by type
-elif opt == "2":
-    choose_type_op(
-        lambda : show_items(BOOK_TYPE),
-        lambda : show_items(ARTICLE_TYPE),
-        lambda : show_items(DIGITAL_TYPE)
-    )
-# 3.borrow by id
-elif opt == "3":
-    id = input("pls enter item id: ")
-    print("id: " + id + " processing...")
-    borrow_return_service.log_borrow(username,id,item_db_all)
-# 4.return by id
-elif opt == "4":
-    id = input("pls enter item id: ")
-    print("id: " + id + " processing...")
-    borrow_return_service.log_return(username,id)
-# 5.add new item
-elif opt == "5":
-    def add_book():
-        n = input("pls enter name: ")
-        d = input("pls enter desciption:")
-        a = input("pls enter authors, split by comma:")
-        authors = a.split(',')
-        Book(n,d,authors).save()
-    def add_article():
-        n = input("pls enter name: ")
-        d = input("pls enter desciption:")
-        Article(n,d).save()
-    def add_digital_media():
-        n = input("pls enter name: ")
-        d = input("pls enter desciption:")
-        DigitalMedia(n,d).save()
-    choose_type_op(add_book, add_article, add_digital_media)
-#  6.upadate by id
-elif opt == "6":
     while True:
-        id_input = input("pls enter item id: ")
-        res = Item.update_by_id(id_input,item_db_all)
-        if res == id_input:
+        # ui and control logic
+        show_ui(MAIN_MENU_URL)
+        opt = input("pls enter your option: ")
+        # list all items
+        if opt == "1":
+            show_items()
+        # list items by type
+        elif opt == "2":
+            choose_type_op(
+                lambda : show_items(BOOK_TYPE),
+                lambda : show_items(ARTICLE_TYPE),
+                lambda : show_items(DIGITAL_TYPE)
+            )
+        # 3.borrow by id
+        elif opt == "3":
+            id = input("pls enter item id: ")
+            print("id: " + id + " processing...")
+            borrow_return_service.log_borrow(username,id,item_db_all)
+        # 4.return by id
+        elif opt == "4":
+            id = input("pls enter item id: ")
+            print("id: " + id + " processing...")
+            borrow_return_service.log_return(username,id)
+        # 5.add new item
+        elif opt == "5":
+            def add_book():
+                n = input("pls enter name: ")
+                d = input("pls enter desciption:")
+                a = input("pls enter authors, split by comma:")
+                authors = a.split(',')
+                Book(n,d,authors).save()
+            def add_article():
+                n = input("pls enter name: ")
+                d = input("pls enter desciption:")
+                Article(n,d).save()
+            def add_digital_media():
+                n = input("pls enter name: ")
+                d = input("pls enter desciption:")
+                DigitalMedia(n,d).save()
+            choose_type_op(add_book, add_article, add_digital_media)
+        #  6.upadate by id
+        elif opt == "6":
+            while True:
+                id_input = input("pls enter item id: ")
+                res = Item.update_by_id(id_input,item_db_all)
+                if res == id_input:
+                    break
+                else:
+                    print(res)
+        #  7.delete by id
+        elif opt == "7":
+            while True:
+                id_input = input("pls enter item id: ")
+                if id_input in item_db_all:
+                    print("curr:: " + "id: " + id_input + ", name: " + item_db_all[id_input]["name"] )
+                    opt = input("delete? y/n: ")
+                    if opt.lower() == "y":
+                        if item_db_all[id_input]["type"] == BOOK_TYPE:
+                            # cascade deleting associated data
+                            Book.delete_by_id(id_input)
+                    Item.delete_by_id(id_input,item_db_all)
+                    break
+                else:
+                    print("invalid id")
+        elif opt == "q":
             break
-        else:
-            print(res)
-#  7.delete by id
-elif opt == "7":
-    while True:
-        id_input = input("pls enter item id: ")
-        if id_input in item_db_all:
-            print("curr:: " + "id: " + id_input + ", name: " + item_db_all[id_input]["name"] )
-            opt = input("delete? y/n: ")
-            if opt.lower() == "y":
-                if item_db_all[id_input]["type"] == BOOK_TYPE:
-                    # cascade deleting associated data
-                    Book.delete_by_id(id_input)
-            Item.delete_by_id(id_input,item_db_all)
-            break
-        else:
-            print("invalid id")
+else:
+    print("wrong username or password")
